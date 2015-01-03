@@ -11,26 +11,27 @@ Altogether around 15k pictures, all tagged and categorized. As you can imagine,
 I have spent long time managing the whole lot and did not really fancy doing that again.
 
 Since Shotwell does not provide any tool for merging the database and I could not find any either,
-I have decided to spend a day writing something mys1elf. I have worked with SQLite in PHP before
-and because I wanted this done quickly, I rolled with it. Otherwise I would have choosen node :)
+I have decided to spend a day writing something myself. I have worked with SQLite in PHP before
+and because I wanted this done quickly, I rolled with it. Otherwise I would have chosen node :)
 
-Ok, so what's the dealio?
+OK, so what's the deal?
 
 The script does three things:
 
 * copies all records from the source database to the destination database
-* updates referencses - as you can imagine, the ids are different after copying, so we need to deal with it
+* updates references - as you can imagine, the ids are different after copying, so we need to deal with that
 * renames thumbnails - the names are merely hex representation of the photo id with 'thumb' prefix and padded to 16 characters
 
 How to merge the databases?
+---------------------------
 
-It's easy-peasy. I presume you have two instances of Shotwell. Take the db from instance #1 and copy it to ./results/photo.db
-Then run the script pointing it to the instance#2. You can also point it to the thumbnails directory if you want
-the renaming done for you as well. Might be quite handy, because Shotwell takes quite to create the thumbnails
+It's easy-peasy. I presume you have two instances of Shotwell. Take the database from instance #1 and copy it to ./results/photo.db
+Then run the script pointing it to the instance #2. You can also point it to the thumbnails directory if you want
+the renaming done for you as well. Might be quite handy, because Shotwell takes quite some time to create the thumbnails
 if you have a few thousands of pictures.
 
-The Shotwell db is usually found in:
-` ~/.local/share/shotwell/data/photo.db`
+The Shotwell database is usually found at:
+`~/.local/share/shotwell/data/photo.db`
 
 The Shotwell thumbs are usually here:
 `~/.cache/shotwell/thumbs/`
