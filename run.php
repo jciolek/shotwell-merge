@@ -47,6 +47,7 @@ $merge = new Shotwell\Merge($source);
 
 // Merge tables.
 $tables = [
+    'VideoTable',
     'PhotoTable',
     'EventTable',
     'TagTable',
@@ -63,6 +64,10 @@ foreach ($tables as $table) {
 // Update tables.
 print('Updating PhotoTable...');
 $merge->updatePhotoTable();
+print('done.'."\n");
+
+print('Updating VideoTable...');
+$merge->updateVideoTable();
 print('done.'."\n");
 
 print('Updating EventTable...');

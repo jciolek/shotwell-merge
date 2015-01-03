@@ -22,10 +22,6 @@ The script does three things:
 * updates referencses - as you can imagine, the ids are different after copying, so we need to deal with it
 * renames thumbnails - the names are merely hex representation of the photo id with 'thumb' prefix and padded to 16 characters
 
-I have taken care of most of the tables with the exception of the VideoTable. This one requires similar treatment to the PhotoTable,
-but since I did not have any videos I was not bothered. If you feel like it - by all means. I will gladly accept
-a reasonable pull request ;)
-
 How to merge the databases?
 
 It's easy-peasy. I presume you have two instances of Shotwell. Take the db from instance #1 and copy it to ./results/photo.db
