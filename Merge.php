@@ -65,6 +65,13 @@ class Merge
         );
 
         $result = $this->src_db->query('SELECT * FROM '.$table);
+        if ($result === false) {
+            // This table doesn't exist in source, skip it.
+            // E.g. the BackingPhotoTable doesn't always exist
+            print('Skipping merge of table: '.$table.'\n');
+            return;
+        }
+
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
             $old_id = $row['id'];
             // We are going to obtain new id during insert.
