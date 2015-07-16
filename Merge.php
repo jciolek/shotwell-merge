@@ -34,6 +34,7 @@ class Merge
         $this->tmp_db->exec('PRAGMA synchronous=OFF');
 
         // Create migration tables in the temporary db.
+        $this->tmp_db->exec('CREATE TABLE IF NOT EXISTS VideoTable (old_id INTEGER, new_id INTEGER)');
         $this->tmp_db->exec('CREATE TABLE IF NOT EXISTS PhotoTable (old_id INTEGER, new_id INTEGER)');
         $this->tmp_db->exec('CREATE TABLE IF NOT EXISTS EventTable (old_id INTEGER, new_id INTEGER)');
         $this->tmp_db->exec('CREATE TABLE IF NOT EXISTS TagTable (old_id INTEGER, new_id INTEGER)');
@@ -64,6 +65,13 @@ class Merge
         );
 
         $result = $this->src_db->query('SELECT * FROM '.$table);
+        if ($result === false) {
+            // This table doesn't exist in source, skip it.
+            // E.g. the BackingPhotoTable doesn't always exist
+            print('Skipping merge of table: '.$table.'\n');
+            return;
+        }
+
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
             $old_id = $row['id'];
             // We are going to obtain new id during insert.
@@ -88,6 +96,7 @@ class Merge
     /**
      * Updates:
      * event_id             - with the new photo id
+     * editable_id          - with the new backing photo id
      */
     public function updatePhotoTable()
     {
@@ -122,6 +131,37 @@ class Merge
 
             $photo_statement_select->reset();
             $photo_statement_update->reset();
+            $event_statement_select->reset();
+        }
+    }
+
+    /**
+     * Updates:
+     * event_id             - with the new photo id
+     */
+    public function updateVideoTable()
+    {
+        $video_statement_select = $this->dst_db->prepare('SELECT * FROM VideoTable WHERE id=:id');
+        $video_statement_update = $this->dst_db->prepare('UPDATE VideoTable SET event_id=:event_id WHERE id=:id');
+        $event_statement_select = $this->tmp_db->prepare('SELECT * FROM EventTable WHERE old_id=:old_id');
+
+        $result = $this->tmp_db->query('SELECT * FROM VideoTable');
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            // Get the video row in order to read the event_id.
+            $video_statement_select->bindValue(':id', $row['new_id']);
+            $video_row = $video_statement_select->execute()->fetchArray(SQLITE3_ASSOC);
+
+            // Get the new event_id
+            $event_statement_select->bindValue(':old_id', $video_row['event_id']);
+            $event_row = $event_statement_select->execute()->fetchArray(SQLITE3_ASSOC);
+
+            // Update event_id
+            $video_statement_update->bindValue(':id', $video_row['id']);
+            $video_statement_update->bindValue(':event_id', $event_row['new_id']);
+            $video_statement_update->execute();
+
+            $video_statement_select->reset();
+            $video_statement_update->reset();
             $event_statement_select->reset();
         }
     }
